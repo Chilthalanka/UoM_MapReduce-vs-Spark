@@ -1,5 +1,7 @@
 # Custom
-
+demo/
+experiment/
+key-pair/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
