@@ -25,6 +25,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Airline delay data analysis')
     parser.add_argument(dest='file_name',
                         help='The SQL file name that should be used for the Spark job')
+    parser.add_argument(dest='mode',
+                        choices=['one_time', 'iterative'],
+                        help='PySpark script execution mode')
+    parser.add_argument('--num_iter',
+                        required=False,
+                        help='Number of iterations to run in iterative mode')
     args = parser.parse_args()
 
     # Load the data to a spark dataframe and create a temporary view
@@ -34,14 +40,25 @@ if __name__ == '__main__':
         load("s3://airline-delay-analysis/input/DelayedFlights-updated.csv")
     df.createOrReplaceTempView("airline_delay")
 
-    # Read the file containing the SQL query
-    sql_script_path = os.path.join(current_dir, "spark-sql/{}".format(args.file_name))
-    with open(sql_script_path) as file:
-        sql_query = file.read()
+    df_load_time = time.time()
+    print(f"PySpark dataframe load time: {(df_load_time - start_time):.2f}s")
 
-    # Run the Spark SQL query
-    result = spark.sql(sql_query)
-    result.show()
+    if args.mode == 'one_time':
+        num_iter = 1
+    elif args.mode == 'iterative':
+        num_iter = int(args.num_iter)
 
-    end_time = time.time()
-    print(f"Spark job execution time: {(end_time - start_time):.2f}s")
+
+    for iteration in range(num_iter):
+        # Read the file containing the SQL query
+        sql_script_path = os.path.join(current_dir, "spark/{}".format(args.file_name))
+        with open(sql_script_path) as file:
+            sql_query = file.read()
+
+        # Run the Spark SQL query
+        result = spark.sql(sql_query)
+        result.show()
+
+        end_time = time.time()
+        print(f"PySpark job execution time - iteration {iteration + 1}: {(end_time - start_time):.2f}s")
+        start_time = time.time()

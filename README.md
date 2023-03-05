@@ -48,6 +48,6 @@ Below steps are followed in Spark approach:
 1. SSH to the primary node and sync the codes in S3 to the node using below command:
 
     `aws s3 sync s3://airline-delay-analysis/code/ ~/code/ --exclude 'folder'`
-2. Run *spark-submit* command to run the PySpark script
+2. Run *spark-submit* command to run the PySpark script in *iterative* mode (run the same query for *num_iter* iterations)
 
-    `spark-submit --master yarn --deploy-mode client --driver-memory 8G --executor-memory 4G  --num-executors 4 ~/code/airline_delay_analysis.py <sql_script>`
+    `spark-submit --master yarn --deploy-mode client --driver-memory 8G --executor-memory 4G  --num-executors 4 ~/code/airline_delay_analysis.py <sql_script> iterative --num_iter 5`
