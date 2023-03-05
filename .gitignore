@@ -2,6 +2,8 @@
 experiment/
 key-pair/
 recordings/
+demo/archived
+spark/outputs/archived
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
